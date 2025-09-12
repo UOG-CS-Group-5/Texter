@@ -1,4 +1,5 @@
 module com.csgroupfive.texter {
+    requires transitive javafx.graphics;
     requires javafx.controls;
     requires javafx.fxml;
     requires org.json;
