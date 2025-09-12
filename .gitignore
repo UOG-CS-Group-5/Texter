@@ -28,3 +28,6 @@ replay_pid*
 
 # Mac
 .DS_Store
+
+# data file
+data.json

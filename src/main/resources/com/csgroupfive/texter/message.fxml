@@ -12,7 +12,7 @@
 <VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.csgroupfive.texter.MessageController">
    <children>
       <Label text="Message" />
-      <TextArea prefHeight="200.0" prefWidth="200.0" />
+      <TextArea fx:id="messageArea" prefHeight="200.0" prefWidth="200.0" />
       <ButtonBar prefHeight="40.0" prefWidth="200.0">
         <buttons>
             <Button fx:id="recipientsButton" onAction="#switchToRecipients" text="Recipients" />
