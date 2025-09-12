@@ -38,6 +38,7 @@ public class MessageController {
             }
         });
 
+        // when send button is pressed
         sendButton.setOnAction(e -> {
             // if text area is empty
             if (messageArea.getText().strip().length() == 0) {
