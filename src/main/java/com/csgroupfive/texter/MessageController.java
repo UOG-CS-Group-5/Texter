@@ -2,14 +2,22 @@ package com.csgroupfive.texter;
 
 import java.io.IOException;
 
+import javafx.animation.Interpolator;
+import javafx.animation.PauseTransition;
+import javafx.animation.TranslateTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.util.Duration;
 
 public class MessageController {
     // message textarea
     @FXML TextArea messageArea;
+    @FXML Button sendButton;
+
+    private boolean animationPlaying = false;
 
     @FXML
     private void switchToRecipients() throws IOException {
@@ -29,5 +37,48 @@ public class MessageController {
                 StoreSingleton.getInstance().setMessage(messageArea.getText());
             }
         });
+
+        sendButton.setOnAction(e -> {
+            // if text area is empty
+            if (messageArea.getText().strip().length() == 0) {
+                // show some user feedback telling user to fill text area
+                userFeedbackEmpty();
+            } else {
+                // TODO: send messages
+            }
+        });
+    }
+
+    private void userFeedbackEmpty() {
+        float bounceTime = 0.125f;
+        int bounceAmt = 4;
+
+        // if already animating, don't start a new one
+        if (animationPlaying) {return;}
+        animationPlaying = true;
+
+        // set button text to "Empty"
+        sendButton.setText("Empty");
+
+        // Set it back some time later
+        PauseTransition pause = new PauseTransition(Duration.seconds(bounceAmt * bounceTime));
+        pause.setOnFinished(e -> {
+            sendButton.setText("Send");
+            // once done, remove animating flag
+            animationPlaying = false;
+        });
+        pause.play();
+
+        // bounce text area back and forth
+        TranslateTransition tt = new TranslateTransition(Duration.seconds(bounceTime), messageArea);
+        // by 4 px
+        tt.setByX(-4);
+        // this many times (full cycles = amt/2)
+        tt.setCycleCount(bounceAmt);
+        // go back to original position every odd cycle
+        tt.setAutoReverse(true);
+        // ease in/out (smoothing)
+        tt.setInterpolator(Interpolator.EASE_BOTH);
+        tt.play();
     }
 }

@@ -16,7 +16,7 @@
       <ButtonBar prefHeight="40.0" prefWidth="200.0">
         <buttons>
             <Button fx:id="recipientsButton" onAction="#switchToRecipients" text="Recipients" />
-            <Button mnemonicParsing="false" text="Send" />
+            <Button fx:id="sendButton" mnemonicParsing="false" text="Send" />
         </buttons>
       </ButtonBar>
    </children>
