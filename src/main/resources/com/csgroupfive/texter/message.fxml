@@ -7,6 +7,8 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.VBox?>
 
+<!-- Made with SceneBuilder -->
+
 <VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.csgroupfive.texter.MessageController">
    <children>
       <Label text="Message" />
