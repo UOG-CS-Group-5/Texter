@@ -1,0 +1,37 @@
+VBox {
+    -fx-background-color: #1F1F1F;
+}
+
+Button, Label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+Button {
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-background-color: #436fce;
+}
+
+Button:hover {
+    -fx-background-color: #6b8edb;
+}
+
+.text-area {
+    -fx-background-color: #2a2a2a;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: gray;
+    -fx-border-width: 2;
+    -fx-padding: 8;
+    -fx-caret-color: white;
+    -fx-text-fill: white; 
+}
+
+.text-area .scroll-pane,
+.text-area .scroll-pane .viewport,
+.text-area .scroll-pane .content {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+}
