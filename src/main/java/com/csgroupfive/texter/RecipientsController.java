@@ -27,14 +27,12 @@ public class RecipientsController {
         List<String> recipients = StoreSingleton.getInstance().getRecipients();
         recipientsArea.setText(String.join("\n", recipients));
 
-        // to reference within the change listener
-        RecipientsController self = this;
         // add a change listener to text area to save recipients on each edit
         // TODO: debounce this
         recipientsArea.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                self.saveRecipients();
+                saveRecipients();
             }
         });
     }
