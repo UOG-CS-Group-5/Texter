@@ -39,7 +39,7 @@ public class RecipientsController {
 
     public void saveRecipients() {
         // split into list of strings
-        String[] recipientsArr = recipientsArea.getText().split("\n");
+        String[] recipientsArr = recipientsArea.getText().split("\n|,");
         List<String> recipientsList = new ArrayList<String>(Arrays.asList(recipientsArr));
 
 
