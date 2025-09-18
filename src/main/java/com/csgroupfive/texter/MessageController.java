@@ -19,6 +19,8 @@ public class MessageController {
     @FXML Button sendButton;
 
     private GreenApi greenApi = new GreenApi();
+    private EmailSender gtaEmailToSms = new EmailSender("", "sms.gta.net");
+    private Messagable[] messagables = {greenApi, gtaEmailToSms};
     private boolean animationPlaying = false;
 
     @FXML
@@ -50,7 +52,16 @@ public class MessageController {
                 String message = messageArea.getText().strip();
                 List<String> recipients = StoreSingleton.getInstance().getRecipients();
                 for (String r : recipients) {
-                    ApiResponseStatus status = greenApi.send_message(message, r);
+                    ApiResponseStatus status = null;
+                    for (Messagable m : messagables) {
+                        status = m.send_message(message, r);
+                        if (status == ApiResponseStatus.SUCCESS) {
+                            break;
+                        }
+                        // TODO: possibly display unknowns and failures to user
+                        // @Francis, I'll let you decide
+                        System.err.println(((Named) m).getName() + " " + status);
+                    }
                     // TODO: display error to user. 
                     // @Francis, here's a UI task :)
                     System.err.println(status);

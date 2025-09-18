@@ -7,15 +7,21 @@ import org.json.JSONObject;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-public class GreenApi  extends HttpApi implements Messagable {
+public class GreenApi extends HttpApi implements Messagable {
     private String API_TOKEN;
     private String ID_INSTANCE;
+    public String name = "GreenAPI";
 
     public GreenApi() {
         Dotenv dotenv = Dotenv.load();
 
         API_TOKEN = dotenv.get("GREEN_API_TOKEN");
         ID_INSTANCE = dotenv.get("GREEN_ID_INSTANCE");
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     public ApiResponseStatus send_message(String message, String recipient) {
