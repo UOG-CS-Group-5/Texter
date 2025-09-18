@@ -2,7 +2,9 @@ module com.csgroupfive.texter {
     requires transitive javafx.graphics;
     requires javafx.controls;
     requires javafx.fxml;
-    requires org.json;
+    requires transitive org.json;
+    requires io.github.cdimascio.dotenv.java;
+    requires java.net.http;
 
     opens com.csgroupfive.texter to javafx.fxml;
     exports com.csgroupfive.texter;

@@ -1,6 +1,7 @@
 package com.csgroupfive.texter;
 
 import java.io.IOException;
+import java.util.List;
 
 import javafx.animation.Interpolator;
 import javafx.animation.PauseTransition;
@@ -17,6 +18,7 @@ public class MessageController {
     @FXML TextArea messageArea;
     @FXML Button sendButton;
 
+    private GreenApi greenApi = new GreenApi();
     private boolean animationPlaying = false;
 
     @FXML
@@ -45,7 +47,14 @@ public class MessageController {
                 // show some user feedback telling user to fill text area
                 userFeedbackEmpty();
             } else {
-                // TODO: send messages
+                String message = messageArea.getText().strip();
+                List<String> recipients = StoreSingleton.getInstance().getRecipients();
+                for (String r : recipients) {
+                    ApiResponseStatus status = greenApi.send_message(message, r);
+                    // TODO: display error to user. 
+                    // @Francis, here's a UI task :)
+                    System.err.println(status);
+                }
             }
         });
     }

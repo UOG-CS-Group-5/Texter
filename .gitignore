@@ -31,3 +31,5 @@ replay_pid*
 
 # data file
 data.json
+
+.env
