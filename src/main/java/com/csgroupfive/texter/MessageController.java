@@ -20,6 +20,7 @@ public class MessageController {
 
     private GreenApi greenApi = new GreenApi();
     private EmailSender gtaEmailToSms = new EmailSender("", "sms.gta.net");
+    // multiple potential endpoints
     private Messagable[] messagables = {greenApi, gtaEmailToSms};
     private boolean animationPlaying = false;
 
@@ -49,12 +50,17 @@ public class MessageController {
                 // show some user feedback telling user to fill text area
                 userFeedbackEmpty();
             } else {
+                // grab message and list of recipients
                 String message = messageArea.getText().strip();
                 List<String> recipients = StoreSingleton.getInstance().getRecipients();
+                // for each recipient
                 for (String r : recipients) {
                     ApiResponseStatus status = null;
+                    // for each messageable endpoint
                     for (Messagable m : messagables) {
+                        // attempt to send a message
                         status = m.send_message(message, r);
+                        // if successful, move on to the next recipient
                         if (status == ApiResponseStatus.SUCCESS) {
                             break;
                         }
