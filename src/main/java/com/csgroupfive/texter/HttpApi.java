@@ -11,8 +11,13 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
-public class HttpApi {
+public class HttpApi implements Named {
     private HttpClient client;
+    public String name = "HttpApi";
+
+    public String getName() {
+        return name;
+    }
 
     public HttpResponse<String> post(String url, JSONObject payload, Map<String, String> headers) throws IOException, InterruptedException {
         if (client == null) {
