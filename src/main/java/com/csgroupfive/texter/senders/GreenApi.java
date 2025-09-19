@@ -5,6 +5,10 @@ import java.net.http.HttpResponse;
 
 import org.json.JSONObject;
 
+import com.csgroupfive.texter.senders.util.ApiResponseStatus;
+import com.csgroupfive.texter.senders.util.HttpApi;
+import com.csgroupfive.texter.senders.util.Messagable;
+
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class GreenApi extends HttpApi implements Messagable {

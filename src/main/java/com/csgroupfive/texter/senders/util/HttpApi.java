@@ -1,4 +1,4 @@
-package com.csgroupfive.texter.senders;
+package com.csgroupfive.texter.senders.util;
 
 import java.io.IOException;
 import java.net.URI;
@@ -10,8 +10,6 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.json.JSONObject;
-
-import com.csgroupfive.texter.Named;
 
 public class HttpApi implements Named {
     private HttpClient client;

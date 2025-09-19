@@ -11,7 +11,9 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import com.csgroupfive.texter.Named;
+import com.csgroupfive.texter.senders.util.ApiResponseStatus;
+import com.csgroupfive.texter.senders.util.Messagable;
+import com.csgroupfive.texter.senders.util.Named;
 
 import io.github.cdimascio.dotenv.Dotenv;
 

@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.util.List;
 
 import com.csgroupfive.texter.App;
-import com.csgroupfive.texter.Named;
 import com.csgroupfive.texter.StoreSingleton;
-import com.csgroupfive.texter.senders.ApiResponseStatus;
 import com.csgroupfive.texter.senders.EmailSender;
 import com.csgroupfive.texter.senders.GreenApi;
-import com.csgroupfive.texter.senders.Messagable;
+import com.csgroupfive.texter.senders.util.ApiResponseStatus;
+import com.csgroupfive.texter.senders.util.Messagable;
+import com.csgroupfive.texter.senders.util.Named;
 
 import javafx.animation.Interpolator;
 import javafx.animation.PauseTransition;
