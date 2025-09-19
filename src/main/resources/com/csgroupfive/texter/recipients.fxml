@@ -9,7 +9,7 @@
 
 <!-- Made with SceneBuilder -->
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.csgroupfive.texter.RecipientsController">
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.csgroupfive.texter.controllers.RecipientsController">
     <children>
         <Label text="Recipients" />
       <TextArea fx:id="recipientsArea" prefHeight="200.0" prefWidth="200.0" />

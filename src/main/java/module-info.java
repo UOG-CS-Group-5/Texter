@@ -7,6 +7,6 @@ module com.csgroupfive.texter {
     requires io.github.cdimascio.dotenv.java;
     requires java.net.http;
 
-    opens com.csgroupfive.texter to javafx.fxml;
+    opens com.csgroupfive.texter.controllers to javafx.fxml;
     exports com.csgroupfive.texter;
 }

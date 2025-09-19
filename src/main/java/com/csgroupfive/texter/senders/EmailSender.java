@@ -1,4 +1,4 @@
-package com.csgroupfive.texter;
+package com.csgroupfive.texter.senders;
 
 import java.util.Properties;
 
@@ -10,6 +10,8 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import com.csgroupfive.texter.Named;
 
 import io.github.cdimascio.dotenv.Dotenv;
 

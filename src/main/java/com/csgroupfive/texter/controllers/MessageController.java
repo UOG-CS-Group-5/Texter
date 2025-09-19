@@ -1,7 +1,15 @@
-package com.csgroupfive.texter;
+package com.csgroupfive.texter.controllers;
 
 import java.io.IOException;
 import java.util.List;
+
+import com.csgroupfive.texter.App;
+import com.csgroupfive.texter.Named;
+import com.csgroupfive.texter.StoreSingleton;
+import com.csgroupfive.texter.senders.ApiResponseStatus;
+import com.csgroupfive.texter.senders.EmailSender;
+import com.csgroupfive.texter.senders.GreenApi;
+import com.csgroupfive.texter.senders.Messagable;
 
 import javafx.animation.Interpolator;
 import javafx.animation.PauseTransition;

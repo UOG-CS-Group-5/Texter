@@ -1,4 +1,4 @@
-package com.csgroupfive.texter;
+package com.csgroupfive.texter.senders;
 
 public enum ApiResponseStatus {
     SUCCESS,

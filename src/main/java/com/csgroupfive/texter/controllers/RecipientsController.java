@@ -1,10 +1,13 @@
-package com.csgroupfive.texter;
+package com.csgroupfive.texter.controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.csgroupfive.texter.App;
+import com.csgroupfive.texter.StoreSingleton;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
