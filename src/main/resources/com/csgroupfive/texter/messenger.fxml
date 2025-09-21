@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="519.0" prefWidth="890.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.csgroupfive.texter.Messenger">
+   <children>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="519.0" prefWidth="281.0" style="-fx-background-color: green;">
+         <children>
+            <ScrollPane layoutX="-4.0" layoutY="1.0" prefHeight="519.0" prefWidth="289.0" style="-fx-background-color: green;">
+                <content>
+                    <VBox fx:id="vbox_messages" prefHeight="497.0" prefWidth="263.0" style="-fx-background-color: green;" />
+                </content>
+            </ScrollPane>
+         </children>
+      </AnchorPane>
+      <TextArea layoutX="318.0" layoutY="112.0" prefHeight="307.0" prefWidth="547.0" />
+      <TextArea layoutX="318.0" layoutY="56.0" prefHeight="39.0" prefWidth="547.0" promptText="TO..." />
+      <Button layoutX="365.0" layoutY="442.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="197.0" text="Button" />
+      <Button layoutX="657.0" layoutY="442.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="169.0" text="Button" />
+   </children>
+</AnchorPane>
