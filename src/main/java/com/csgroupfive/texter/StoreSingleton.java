@@ -54,6 +54,9 @@ public class StoreSingleton {
         if (!json.has("message")) {
             json.put("message", "");
         }
+        if (!json.has("savedMessages")) {
+            json.put("savedMessages", new JSONArray());
+        }
         this.data = json;
     }
 
@@ -91,6 +94,86 @@ public class StoreSingleton {
 
     public void setMessage(String message) {
         this.data.put("message", message);
+        this.saveData();
+    }
+
+    public List<String> getSavedMessages() {
+        JSONArray arr = this.data.getJSONArray("savedMessages");
+        return arr.toList().stream()
+                .map(Object::toString)
+                .collect(Collectors.toList());
+    }
+
+    public void addSavedMessage(String msg) {
+        if (msg == null) return;
+        String clean = msg.strip();
+        if (clean.isEmpty()) return;
+        this.data.getJSONArray("savedMessages").put(clean);
+        this.saveData();
+    }
+
+    public void updateSavedMessage(int index, String newText) {
+        if (newText == null) return;
+        String clean = newText.strip();
+
+        JSONArray arr = this.data.getJSONArray("savedMessages");
+        if (index >= 0 && index < arr.length()) {
+            arr.put(index, clean);     // write back into the JSON array
+            this.saveData();           // persist to data.json
+        }
+    }
+
+    public void updateAndMoveSavedMessageToFront(int index, String newText) {
+        if (newText == null) return;
+        String clean = newText.strip();
+        if (clean.isEmpty()) return;
+
+        org.json.JSONArray old = this.data.getJSONArray("savedMessages");
+        if (index < 0 || index >= old.length()) return;
+
+        org.json.JSONArray fresh = new org.json.JSONArray();
+        fresh.put(clean); // put edited at front
+        for (int i = 0; i < old.length(); i++) {
+            if (i == index) continue;
+            fresh.put(old.get(i));
+        }
+        this.data.put("savedMessages", fresh);
+        this.saveData();
+    }
+
+    public void prependSavedMessage(String msg) {
+        if (msg == null) return;
+        String clean = msg.strip();
+        if (clean.isEmpty()) return;
+
+        org.json.JSONArray old = this.data.getJSONArray("savedMessages");
+        org.json.JSONArray fresh = new org.json.JSONArray();
+        fresh.put(clean); // new at front
+        for (int i = 0; i < old.length(); i++) {
+            fresh.put(old.get(i));
+        }
+        this.data.put("savedMessages", fresh);
+        this.saveData();
+    }
+
+    public void removeSavedMessage(String msg) {
+        if (msg == null) return;
+        JSONArray arr = this.data.getJSONArray("savedMessages");
+        // remove all matches of that exact text
+        for (int i = arr.length() - 1; i >= 0; i--) {
+            if (msg.equals(arr.getString(i))) {
+                arr.remove(i);
+            }
+        }
+        this.saveData();
+    }
+
+    public int getSavedMessagesCount() {
+        return this.data.getJSONArray("savedMessages").length();
+    }
+
+    public void clearSavedMessages() {
+        this.data.put("savedMessages", new JSONArray());
         this.saveData();
     }
 }
