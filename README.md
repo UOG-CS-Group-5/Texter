@@ -1,7 +1,7 @@
 # Texter
-SMS / Whatsapp message sender
+SMS / Whatsapp / Email message sender
 
-This program attempts to send SMS/Whatsapp messages to a customizable list of numbers. The program tries one strategy after another until one works. It is possible that no methods work in which case no messages will be sent. As some methods don't give trustable return statuses, it is also possible that multiple messages are sent to the same number.
+This program attempts to send SMS/Whatsapp/Email messages to a customizable list of recipients (phone numbers or email addresses). The program tries one strategy after another until one works. It is possible that no methods work in which case no messages will be sent. As some methods don't give trustable return statuses, it is also possible that multiple messages are sent to the same number.
 
 ## Config
 Make sure to set up the api and smtp credentials by creating a `.env` file following the format shown in `sample.env`.
