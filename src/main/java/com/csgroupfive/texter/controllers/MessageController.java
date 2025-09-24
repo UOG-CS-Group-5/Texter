@@ -17,17 +17,27 @@ import com.csgroupfive.texter.senders.util.SenderType;
 import javafx.animation.Interpolator;
 import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.scene.control.Alert;
 import javafx.util.Duration;
 
 public class MessageController {
     // message textarea
     @FXML TextArea messageArea;
-    @FXML Button sendButton;
+    @FXML Button sendButton, savebutton;
+    @FXML ScrollPane sp_main;
+    @FXML VBox vbox_msg;
 
     private GreenApi greenApi = new GreenApi();
     private EmailToSmsSender gtaEmailToSms = new EmailToSmsSender("", "sms.gta.net");
@@ -35,6 +45,8 @@ public class MessageController {
     // multiple potential endpoints
     private Messagable[] messagables = {greenApi, gtaEmailToSms, regularEmailer};
     private boolean animationPlaying = false;
+    private int selectedIndex = -1;
+    private Text selectedBubbleText;
 
     @FXML
     private void switchToRecipients() throws IOException {
@@ -43,6 +55,8 @@ public class MessageController {
 
     @FXML
     public void initialize() {
+        selectedIndex = -1;
+        selectedBubbleText = null;
         // set message textarea to the contents of the data saved in the data file
         messageArea.setText(StoreSingleton.getInstance().getMessage());
 
@@ -52,8 +66,27 @@ public class MessageController {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                 StoreSingleton.getInstance().setMessage(messageArea.getText());
+
+                // live update the selected saved message
+                if (selectedIndex >= 0) {
+                    StoreSingleton.getInstance().updateSavedMessage(selectedIndex, newValue);
+                    if (selectedBubbleText != null) {
+                        selectedBubbleText.setText(newValue);
+                    }
+                }
             }
         });
+
+        //set up Save and Clear
+        if (savebutton != null) {
+            savebutton.setOnAction(e -> saveCurrentMessage());
+        }
+        if (sp_main != null) {
+            sp_main.setFitToWidth(true);
+        }
+
+        // saved messages show at startup
+        refreshSavedMessagesUI();
 
         // when send button is pressed
         sendButton.setOnAction(e -> {
@@ -98,6 +131,99 @@ public class MessageController {
                 }
             }
         });
+    }
+
+
+    // save current textarea content and render a bubble
+    private void saveCurrentMessage() {
+        String text = messageArea.getText() == null ? "" : messageArea.getText().trim();
+        if (text.isEmpty()) {
+            showInfo("Nothing to save");
+            return;
+        }
+
+        if (selectedIndex >= 0) {
+            StoreSingleton.getInstance().updateAndMoveSavedMessageToFront(selectedIndex, text);
+            selectedIndex = -1;
+            selectedBubbleText = null;
+        } else {
+            StoreSingleton.getInstance().prependSavedMessage(text);
+        }
+
+        refreshSavedMessagesUI();
+        Platform.runLater(() -> sp_main.setVvalue(0.0)); // top
+        messageArea.clear();
+    }
+
+    // Refresh saved messages
+    private void refreshSavedMessagesUI() {
+        if (vbox_msg == null) return;
+        vbox_msg.getChildren().clear();
+
+        java.util.List<String> saved = StoreSingleton.getInstance().getSavedMessages();
+        for (int i = 0; i < saved.size(); i++) {
+            addBubbleToVBox(saved.get(i), i); // pass real index
+        }
+
+        Platform.runLater(() -> sp_main.setVvalue(0.0)); // show top
+    }
+
+    // create one bubble and add to the vbox
+    private void addBubbleToVBox(String text, int indexInStore) {
+        Node bubbleRow = createMessageBubble(text, indexInStore);
+        vbox_msg.getChildren().add(bubbleRow); // append
+    }
+
+    // Click to load back to textarea
+    private Node createMessageBubble(String text, int indexInStore) {
+        Text content = new Text(text);
+        content.wrappingWidthProperty().bind(vbox_msg.widthProperty().subtract(32));
+
+        VBox bubble = new VBox(content);
+        bubble.setPadding(new Insets(8, 12, 8, 12));
+        bubble.setStyle(
+                "-fx-background-color: #e8f0ff;" +
+                        " -fx-background-radius: 10;" +
+                        " -fx-border-color: #c6d7ff;" +
+                        " -fx-border-radius: 10;"
+        );
+        bubble.maxWidthProperty().bind(vbox_msg.widthProperty().subtract(16));
+
+        HBox row = new HBox(bubble);
+        row.setPadding(new Insets(6, 8, 6, 8));
+
+        row.setOnMouseClicked(ev -> {
+            // set current selection
+            selectedIndex = indexInStore;
+            selectedBubbleText = content;
+
+            // load into editor
+            messageArea.setText(StoreSingleton.getInstance().getSavedMessages().get(indexInStore));
+
+            // small visual feedback
+            bubble.setStyle(
+                    "-fx-background-color: #dbe7ff;" +
+                            " -fx-background-radius: 10;" +
+                            " -fx-border-color: #aac4ff;" +
+                            " -fx-border-radius: 10;"
+            );
+            PauseTransition t = new PauseTransition(Duration.millis(150));
+            t.setOnFinished(_x -> bubble.setStyle(
+                    "-fx-background-color: #e8f0ff;" +
+                            " -fx-background-radius: 10;" +
+                            " -fx-border-color: #c6d7ff;" +
+                            " -fx-border-radius: 10;"
+            ));
+            t.play();
+        });
+
+        return row;
+    }
+
+    private void showInfo(String msg) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION, msg);
+        a.setHeaderText(null);
+        a.showAndWait();
     }
 
     private void userFeedbackEmpty() {
