@@ -146,7 +146,7 @@ public class MessageController {
             });
 
             sp_main.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-            sp_main.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+            sp_main.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
             sp_main.setFitToHeight(false);
             sp_main.setPannable(true);
         }
@@ -290,23 +290,22 @@ public class MessageController {
     // create one bubble and add to the vbox
     private void addBubbleToVBox(String text, int indexInStore) {
         Node bubbleRow = createMessageBubble(text, indexInStore);
-        vbox_msg.getChildren().add(bubbleRow); // append
+        vbox_msg.getChildren().add(bubbleRow);
     }
 
     private Node createMessageBubble(String stored, int indexInStore) {
-        // Get final values once. Do not reassign later.
         final String[] parsed = parseSubjectBody(stored);
         final String subjectText = parsed[0];
         final String bodyText    = parsed[1];
 
         Label subjectLabel = new Label(subjectText);
-        subjectLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #000000;");
+        subjectLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #000000; -fx-font-size: 13px;");
         subjectLabel.setWrapText(false);
         subjectLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
         subjectLabel.setMaxWidth(Double.MAX_VALUE);
 
         Label bodyLabel = new Label(bodyText);
-        bodyLabel.setStyle("-fx-text-fill: #666666; -fx-font-size: 12px;");
+        bodyLabel.setStyle("-fx-text-fill: #132a13; -fx-font-size: 12px;");
         bodyLabel.setWrapText(false);
         bodyLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
         bodyLabel.setMaxWidth(Double.MAX_VALUE);
@@ -317,14 +316,7 @@ public class MessageController {
         inner.setMaxWidth(Double.MAX_VALUE);
 
         VBox container = new VBox(inner);
-        container.setPadding(new Insets(8, 0, 8, 0));
-        container.setStyle(
-                "-fx-background-color: white;" +
-                        " -fx-background-radius: 0;" +
-                        " -fx-border-color: #e0e0e0;" +
-                        " -fx-border-radius: 0;" +
-                        " -fx-border-width: 0 0 1 0;"
-        );
+        container.getStyleClass().add("bubble"); // use CSS class
         container.setMaxWidth(Double.MAX_VALUE);
 
         HBox row = new HBox(container);
@@ -349,10 +341,10 @@ public class MessageController {
                 Platform.runLater(() -> suppressTextListener = false);
             }
 
-            String old = container.getStyle();
-            container.setStyle(old + " -fx-background-color: #f6f9ff;");
+            // Visual feedback without changing layout: quick fade flash
+            container.setOpacity(0.85);
             PauseTransition t = new PauseTransition(Duration.millis(150));
-            t.setOnFinished(_x -> container.setStyle(old));
+            t.setOnFinished(_x -> container.setOpacity(1.0));
             t.play();
         });
 

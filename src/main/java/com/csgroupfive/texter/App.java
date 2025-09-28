@@ -19,6 +19,7 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
         // load message scene
         scene = new Scene(loadFXML("message"), 850, 548);
+        stage.setResizable(false);
         // set styles for the app
         scene.getStylesheets().add(App.class.getResource("/com/csgroupfive/texter/css/main.css").toExternalForm());
         
