@@ -47,10 +47,24 @@ public class RecipientsController {
 
 
         recipientsList = recipientsList.stream()
-                                       // remove non-numeric
-                                       .map(s -> s.replaceAll("\\D", ""))
-                                       // filter out non-10 digit numbers
-                                       .filter(s -> s != null && s.length() == 10)
+                                       .map(s -> {
+                                            if (s.indexOf('@') == -1) {
+                                                // remove non-numeric
+                                                return s.replaceAll("\\D", "");
+                                            } else {
+                                                // if it's an email address, just strip whitespaces
+                                                return s.strip();
+                                            }
+                                       })
+                                       .filter(s -> {
+                                            if (s.indexOf('@') == -1) {
+                                                // filter out non-10 digit numbers
+                                                return s != null && s.length() == 10;
+                                            } else {
+                                                // filter out things that don't look like an email. rudimentary check
+                                                return s.indexOf('.') > s.indexOf('@') && s.length() >= 6;
+                                            }
+                                       })
                                        .collect(Collectors.toList());
 
         // save recipients
