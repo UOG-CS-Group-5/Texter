@@ -115,11 +115,12 @@ public class StoreSingleton {
     public void updateSavedMessage(int index, String newText) {
         if (newText == null) return;
         String clean = newText.strip();
+        if (clean.isEmpty()) return;     // NEW: do not persist blanks
 
         JSONArray arr = this.data.getJSONArray("savedMessages");
         if (index >= 0 && index < arr.length()) {
-            arr.put(index, clean);     // write back into the JSON array
-            this.saveData();           // persist to data.json
+            arr.put(index, clean);
+            this.saveData();
         }
     }
 
@@ -156,16 +157,12 @@ public class StoreSingleton {
         this.saveData();
     }
 
-    public void removeSavedMessage(String msg) {
-        if (msg == null) return;
+    public void removeSavedMessage(int index) {
         JSONArray arr = this.data.getJSONArray("savedMessages");
-        // remove all matches of that exact text
-        for (int i = arr.length() - 1; i >= 0; i--) {
-            if (msg.equals(arr.getString(i))) {
-                arr.remove(i);
-            }
+        if (index >= 0 && index < arr.length()) {
+            arr.remove(index);   // remove from JSON array
+            this.saveData();     // persist
         }
-        this.saveData();
     }
 
     public int getSavedMessagesCount() {

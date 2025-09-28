@@ -1,50 +1,23 @@
-VBox {
-    -fx-background-color: #1F1F1F;
-    background-color: #1F1F1F;
+.text-area:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-background-insets: 0;  /* removes inner highlight border */
+    -fx-effect: null;          /* removes drop shadow glow */
 }
 
-Button, Label {
-    -fx-text-fill: white;
+.button, Label {
+    -fx-text-fill: black;
     -fx-font-weight: bold;
-    font-weight: bold;
 }
 
-Button {
+.button {
+    -fx-border-color: black;
+    -fx-border-width: 1;
     -fx-border-radius: 5;
-    border-radius: 5px;
     -fx-background-radius: 5;
-    -fx-background-color: #436fce;
-    background-color: #436fce;
+    -fx-background-color: white;
 }
 
-Button:hover {
+.button:hover {
     -fx-background-color: #6b8edb;
-    background-color: #6b8edb;
-}
-
-.text-area {
-    -fx-background-color: #2a2a2a;
-    background-color: #2a2a2a;
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
-    border-radius: 8px;
-    -fx-border-color: gray;
-    border-color: gray;
-    -fx-border-width: 2;
-    border-width: 2px;
-    -fx-padding: 8;
-    padding: 8px;
-    -fx-caret-color: white;
-    caret-color: white;
-    -fx-text-fill: white; 
-}
-
-.text-area .scroll-pane,
-.text-area .scroll-pane .viewport,
-.text-area .scroll-pane .content {
-    -fx-background-color: transparent;
-    background-color: transparent;
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
-    border-radius: 8px;
 }
