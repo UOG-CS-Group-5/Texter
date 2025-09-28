@@ -7,26 +7,22 @@ import org.json.JSONObject;
 
 import com.csgroupfive.texter.senders.util.ApiResponseStatus;
 import com.csgroupfive.texter.senders.util.HttpApi;
-import com.csgroupfive.texter.senders.util.Messagable;
+import com.csgroupfive.texter.senders.util.SenderType;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-public class GreenApi extends HttpApi implements Messagable {
+public class GreenApi extends HttpApi {
     private String API_TOKEN;
     private String ID_INSTANCE;
-    public String name = "GreenAPI";
 
     public GreenApi() {
+        super("GreenAPI", SenderType.SMS);
+
         Dotenv dotenv = Dotenv.load();
 
         // grab configs
         API_TOKEN = dotenv.get("GREEN_API_TOKEN");
         ID_INSTANCE = dotenv.get("GREEN_ID_INSTANCE");
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     public ApiResponseStatus send_message(String message, String recipient) {

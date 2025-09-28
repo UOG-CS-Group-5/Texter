@@ -9,10 +9,13 @@ import java.util.stream.Collectors;
 import com.csgroupfive.texter.App;
 import com.csgroupfive.texter.StoreSingleton;
 import com.csgroupfive.texter.senders.EmailSender;
+import com.csgroupfive.texter.senders.EmailToSmsSender;
 import com.csgroupfive.texter.senders.GreenApi;
 import com.csgroupfive.texter.senders.util.ApiResponseStatus;
+import com.csgroupfive.texter.senders.util.Emailer;
 import com.csgroupfive.texter.senders.util.Messagable;
-import com.csgroupfive.texter.senders.util.Named;
+import com.csgroupfive.texter.senders.util.Sender;
+import com.csgroupfive.texter.senders.util.SenderType;
 
 import javafx.animation.Interpolator;
 import javafx.animation.PauseTransition;
@@ -40,9 +43,10 @@ public class MessageController {
     @FXML Button newMsgButton;
 
     private GreenApi greenApi = new GreenApi();
-    private EmailSender gtaEmailToSms = new EmailSender("", "sms.gta.net");
+    private EmailToSmsSender gtaEmailToSms = new EmailToSmsSender("", "sms.gta.net");
+    private EmailSender regularEmailer = new EmailSender();
     // multiple potential endpoints
-    private Messagable[] messagables = {greenApi, gtaEmailToSms};
+    private Messagable[] messagables = {greenApi, gtaEmailToSms, regularEmailer};
     private boolean animationPlaying = false;
     private boolean suppressTextListener = false;
     private boolean suppressRecipientsListener = false;
@@ -166,15 +170,27 @@ public class MessageController {
                     ApiResponseStatus status = null;
                     // for each messageable endpoint
                     for (Messagable m : messagables) {
-                        // attempt to send a message
-                        status = m.send_message(message, r);
+
+                        boolean isEmail = r.indexOf('@') != -1;
+                        SenderType senderType = ((Sender) m).getType();
+                        // differentiating types here so we can later add a subject field if wanted
+                        if (isEmail) {
+                            if (senderType == SenderType.EMAIL) {
+                                // TODO: add subject and/or from field once @Frances adds subject box
+                                status = ((Emailer) m).send_email(message, r);
+                            }
+                        } else {
+                            if (senderType == SenderType.SMS) {
+                                status = m.send_message(message, r);
+                            }
+                        }
                         // if successful, move on to the next recipient
                         if (status == ApiResponseStatus.SUCCESS) {
                             break;
                         }
                         // TODO: possibly display unknowns and failures to user
                         // @Francis, I'll let you decide
-                        System.err.println(((Named) m).getName() + " " + status);
+                        System.err.println(((Sender) m).getName() + " " + status);
                     }
                     // TODO: display error to user. 
                     // @Francis, here's a UI task :)
