@@ -1,23 +1,141 @@
-.text-area:focused {
-    -fx-focus-color: transparent;
-    -fx-faint-focus-color: transparent;
-    -fx-background-insets: 0;  /* removes inner highlight border */
-    -fx-effect: null;          /* removes drop shadow glow */
+
+.scroll-pane,
+.scroll-pane:focused {
+    -fx-background-color: #a8b9a2;   /* green background */
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-border-color: transparent;
+    -fx-border-insets: 0;
+    -fx-border-width: 0;
 }
 
-.button, Label {
-    -fx-text-fill: black;
-    -fx-font-weight: bold;
+/* Viewport (area behind your content) */
+.scroll-pane > .viewport {
+    -fx-background-color: #a8b9a2;
+}
+
+/* Corner where bars meet (hide it) */
+.scroll-pane .corner {
+    -fx-background-color: #a8b9a2;
+}
+
+/* === Vertical ScrollBar === */
+.scroll-bar:vertical {
+    -fx-pref-width: 8;              /* make it thinner */
+    -fx-background-color: #a8b9a2;  /* match background */
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-border-color: transparent;
+    -fx-border-insets: 0;
+    -fx-border-width: 0;
+}
+
+/* Track behind the thumb */
+.scroll-bar:vertical .track,
+.scroll-bar:vertical .track-background {
+    -fx-background-color: #a8b9a2;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+/* Thumb (the draggable part) */
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #506a55;  /* dark green thumb */
+    -fx-background-radius: 4;       /* rounded edges */
+}
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #364d3a;  /* darker on hover */
+}
+
+/* === Hide horizontal bar completely === */
+.scroll-bar:horizontal {
+    -fx-pref-height: 0;
+    -fx-opacity: 0;
+    -fx-max-height: 0;
+    -fx-min-height: 0;
+}
+
+/* 5) Make sure the content container does not re-introduce a white background */
+.vbox, .hbox, .anchor-pane, .stack-pane {
+    -fx-background-color: transparent;   /* only if you see white from parent panes */
+}
+
+.hbox:focused, .vbox:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-background-insets: 0;
 }
 
 .button {
-    -fx-border-color: black;
+    -fx-border-color: #506a55;
     -fx-border-width: 1;
     -fx-border-radius: 5;
     -fx-background-radius: 5;
     -fx-background-color: white;
+    -fx-font-weight: bold;
+}
+
+#sendButton{
+    -fx-background-color: #a8b9a2;
 }
 
 .button:hover {
-    -fx-background-color: #6b8edb;
+    -fx-background-color: #a8b9a2;
+}
+
+#side_bar{
+    -fx-background-color: 	#506a55;
+    -fx-effect: dropshadow(gaussian, #485f4c, 7, 0.3, 3, 0);
+}
+
+#savemsg_lbl{
+    -fx-background-color: #a8b9a2;
+    -fx-font-weight: bold;
+    -fx-text-fill: #132a13;
+}
+
+.bubble {
+    -fx-background-color: #a8b9a2;
+    -fx-border-color: #506a55;
+    -fx-border-width: 0 0 1 0;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-padding: 15 10 15 10;
+}
+
+.bubble.selected {
+    -fx-background-color: #cad5c7;
+    -fx-border-color: #506a55;
+    -fx-border-width: 0 0 1 0;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-padding: 15 10 15 10;
+}
+
+.text-area.center-left-text .content {
+    -fx-padding: 15;
+    -fx-alignment: center-left;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: #506a55;
+}
+.text-area,
+.text-area:focused {
+     -fx-focus-color: transparent;
+        -fx-faint-focus-color: transparent;
+        -fx-background-insets: 0;
+        -fx-border-width: 0;
+        -fx-border-radius: 0;
+        -fx-background-radius: 0;
+        -fx-effect: null;
+}
+
+
+.text-area .content {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+#messageArea .content{
+   -fx-padding: 20 10 10 20;
 }
