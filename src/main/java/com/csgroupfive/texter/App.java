@@ -18,7 +18,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         // load message scene
-        scene = new Scene(loadFXML("message"), 800, 500);
+        scene = new Scene(loadFXML("message"), 850, 548);
         // set styles for the app
         scene.getStylesheets().add(App.class.getResource("/com/csgroupfive/texter/css/main.css").toExternalForm());
         
