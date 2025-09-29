@@ -71,8 +71,17 @@ public class MessageController {
         ChangeListener<String> toggleNewMsg = (obs, ov, nv) -> {
             if (suppressTextListener) return;
 
-            String subj = subjectArea != null && subjectArea.getText() != null ? subjectArea.getText().strip() : "";
+            String subj = subjectArea != null && subjectArea.getText() != null ? subjectArea.getText() : "";
             String body = messageArea != null && messageArea.getText() != null ? messageArea.getText().strip() : "";
+
+            // remove newlines in subj.
+            if (subj.indexOf("\n") >= 0) {
+                subjectArea.setText(subj.replace("\n", ""));
+                return;
+            }
+
+            subj = subj.strip();
+
             boolean hasAny = !subj.isEmpty() || !body.isEmpty();
             newMsgButton.setVisible(hasAny);
 
