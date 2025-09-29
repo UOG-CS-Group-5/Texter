@@ -17,9 +17,7 @@ import com.csgroupfive.texter.senders.util.Messagable;
 import com.csgroupfive.texter.senders.util.Sender;
 import com.csgroupfive.texter.senders.util.SenderType;
 
-import javafx.animation.Interpolator;
 import javafx.animation.PauseTransition;
-import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -47,10 +45,10 @@ public class MessageController {
     private EmailSender regularEmailer = new EmailSender();
     // multiple potential endpoints
     private Messagable[] messagables = {greenApi, gtaEmailToSms, regularEmailer};
-    private boolean animationPlaying = false;
     private boolean suppressTextListener = false;
     private boolean suppressRecipientsListener = false;
     private int selectedIndex = -1;
+    @SuppressWarnings("unused")
     private Text selectedBubbleText;
 
     @FXML
@@ -313,19 +311,6 @@ public class MessageController {
 
         if (scrollToTop) {
             Platform.runLater(() -> sp_main.setVvalue(0.0));
-        }
-    }
-
-    private static String[] parseSubjectBody(String stored) {
-        if (stored == null) return new String[] {"", ""};
-        int idx = stored.indexOf('\n');
-        if (idx >= 0) {
-            String subject = stored.substring(0, idx);
-            String body = stored.substring(idx + 1);
-            return new String[] {subject, body};
-        } else {
-            // legacy one liners are body only
-            return new String[] {"", stored};
         }
     }
 
