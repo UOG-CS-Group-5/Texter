@@ -17,9 +17,7 @@ import com.csgroupfive.texter.senders.util.Messagable;
 import com.csgroupfive.texter.senders.util.Sender;
 import com.csgroupfive.texter.senders.util.SenderType;
 
-import javafx.animation.Interpolator;
 import javafx.animation.PauseTransition;
-import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -47,10 +45,10 @@ public class MessageController {
     private EmailSender regularEmailer = new EmailSender();
     // multiple potential endpoints
     private Messagable[] messagables = {greenApi, gtaEmailToSms, regularEmailer};
-    private boolean animationPlaying = false;
     private boolean suppressTextListener = false;
     private boolean suppressRecipientsListener = false;
     private int selectedIndex = -1;
+    @SuppressWarnings("unused")
     private Text selectedBubbleText;
 
     @FXML
@@ -71,8 +69,17 @@ public class MessageController {
         ChangeListener<String> toggleNewMsg = (obs, ov, nv) -> {
             if (suppressTextListener) return;
 
-            String subj = subjectArea != null && subjectArea.getText() != null ? subjectArea.getText().strip() : "";
+            String subj = subjectArea != null && subjectArea.getText() != null ? subjectArea.getText() : "";
             String body = messageArea != null && messageArea.getText() != null ? messageArea.getText().strip() : "";
+
+            // remove newlines in subj.
+            if (subj.indexOf("\n") >= 0) {
+                subjectArea.setText(subj.replace("\n", ""));
+                return;
+            }
+
+            subj = subj.strip();
+
             boolean hasAny = !subj.isEmpty() || !body.isEmpty();
             newMsgButton.setVisible(hasAny);
 
@@ -93,7 +100,7 @@ public class MessageController {
                         Platform.runLater(() -> suppressTextListener = false);
                     }
                 } else {
-                    String combined = combineSubjectBody(subj, body);
+                    List<String> combined = combineSubjectBody(subj, body);
                     StoreSingleton.getInstance().updateSavedMessage(selectedIndex, combined);
                 }
             }
@@ -105,7 +112,8 @@ public class MessageController {
         if (recipientsArea != null) {
             // Load recipients into the textarea
             List<String> recipients = StoreSingleton.getInstance().getRecipients();
-            recipientsArea.setText(String.join("\n", recipients));
+
+            recipientsArea.setText(String.join(", ", recipients));
 
             // Save on each edit
             recipientsArea.textProperty().addListener(new ChangeListener<String>() {
@@ -115,6 +123,15 @@ public class MessageController {
                     saveRecipients();  // call the method below
                 }
             });
+
+            // @Frances, I'll let you decide how you want this to show/say
+            Tooltip tip = new Tooltip("comma-separated 10-digit numbers and/or emails");
+            Tooltip.install(recipientsArea, tip);
+
+            tip.setShowDelay(Duration.seconds(0.1));
+            tip.setHideDelay(Duration.seconds(0.1));
+            tip.setShowDuration(Duration.seconds(5));
+
         }
 
         //Save
@@ -164,6 +181,8 @@ public class MessageController {
             } else {
                 // grab message and list of recipients
                 String message = messageArea.getText().strip();
+                String subj = subjectArea.getText().strip();
+                String subjMsg = String.join("\n\n", new String[] {subj, message}).strip();
                 List<String> recipients = StoreSingleton.getInstance().getRecipients();
                 // for each recipient
                 for (String r : recipients) {
@@ -176,12 +195,17 @@ public class MessageController {
                         // differentiating types here so we can later add a subject field if wanted
                         if (isEmail) {
                             if (senderType == SenderType.EMAIL) {
-                                // TODO: add subject and/or from field once @Frances adds subject box
-                                status = ((Emailer) m).send_email(message, r);
+                                if (message.isEmpty()) {
+                                    status = ((Emailer) m).send_email(subj, r);
+                                } else if (subj.isEmpty()) {
+                                    status = ((Emailer) m).send_email(message, r);
+                                } else {
+                                    status = ((Emailer) m).send_email(subj, message, r);
+                                }
                             }
                         } else {
                             if (senderType == SenderType.SMS) {
-                                status = m.send_message(message, r);
+                                status = m.send_message(subjMsg, r);
                             }
                         }
                         // if successful, move on to the next recipient
@@ -209,22 +233,38 @@ public class MessageController {
         String[] recipientsArr = raw.split("\n|,");
         List<String> recipientsList = new ArrayList<>(Arrays.asList(recipientsArr));
 
-        // Normalize: keep digits only, require 10 digits
+        // Normalize: keep digits (require 10 digits) and email address-like things
         recipientsList = recipientsList.stream()
-                .map(s -> s == null ? "" : s.replaceAll("\\D", ""))
-                .filter(s -> s.length() == 10)
-                .collect(Collectors.toList());
+                                       .map(s -> {
+                                            if (s.indexOf('@') == -1) {
+                                                // remove non-numeric
+                                                return s.replaceAll("\\D", "");
+                                            } else {
+                                                // if it's an email address, just strip whitespaces
+                                                return s.strip();
+                                            }
+                                       })
+                                       .filter(s -> {
+                                            if (s.indexOf('@') == -1) {
+                                                // filter out non-10 digit numbers
+                                                return s != null && s.length() == 10;
+                                            } else {
+                                                // filter out things that don't look like an email. rudimentary check
+                                                return s.indexOf('.') > s.indexOf('@') && s.length() >= 6;
+                                            }
+                                       })
+                                       .collect(Collectors.toList());
 
         StoreSingleton.getInstance().setRecipients(recipientsList);
     }
 
-    private static String combineSubjectBody(String subject, String body) {
+    private static List<String> combineSubjectBody(String subject, String body) {
         subject = subject == null ? "" : subject.strip();
         body    = body    == null ? "" : body.strip();
 
-        if (subject.isEmpty()) return body;          // store body only
-        if (body.isEmpty())    return subject;       // store subject only
-        return subject + "\n" + body;                // store subject + body
+        // if (subject.isEmpty()) return Arrays.asList("", body);          // store body only
+        // if (body.isEmpty())    return Arrays.asList("", subject);       // store subject only
+        return Arrays.asList(subject, body);                // store subject + body
     }
 
     private void saveCurrentMessage() {
@@ -236,7 +276,7 @@ public class MessageController {
             return;
         }
 
-        String combined = combineSubjectBody(subj, body);
+        List<String> combined = combineSubjectBody(subj, body);
 
         if (selectedIndex >= 0) {
             StoreSingleton.getInstance().updateAndMoveSavedMessageToFront(selectedIndex, combined);
@@ -264,7 +304,7 @@ public class MessageController {
         if (vbox_msg == null) return;
         vbox_msg.getChildren().clear();
 
-        java.util.List<String> saved = StoreSingleton.getInstance().getSavedMessages();
+        List<List<String>> saved = StoreSingleton.getInstance().getSavedMessages();
         for (int i = 0; i < saved.size(); i++) {
             addBubbleToVBox(saved.get(i), i); // pass real index
         }
@@ -274,27 +314,14 @@ public class MessageController {
         }
     }
 
-    private static String[] parseSubjectBody(String stored) {
-        if (stored == null) return new String[] {"", ""};
-        int idx = stored.indexOf('\n');
-        if (idx >= 0) {
-            String subject = stored.substring(0, idx);
-            String body = stored.substring(idx + 1);
-            return new String[] {subject, body};
-        } else {
-            // legacy one liners are body only
-            return new String[] {"", stored};
-        }
-    }
-
     // create one bubble and add to the vbox
-    private void addBubbleToVBox(String text, int indexInStore) {
+    private void addBubbleToVBox(List<String> text, int indexInStore) {
         Node bubbleRow = createMessageBubble(text, indexInStore);
         vbox_msg.getChildren().add(bubbleRow);
     }
 
-    private Node createMessageBubble(String stored, int indexInStore) {
-        final String[] parsed = parseSubjectBody(stored);
+    private Node createMessageBubble(List<String> stored, int indexInStore) {
+        final String[] parsed = stored.toArray(new String[0]); // parseSubjectBody(stored);
         final String subjectText = parsed[0];
         final String bodyText    = parsed[1];
 
