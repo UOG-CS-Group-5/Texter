@@ -105,7 +105,8 @@ public class MessageController {
         if (recipientsArea != null) {
             // Load recipients into the textarea
             List<String> recipients = StoreSingleton.getInstance().getRecipients();
-            recipientsArea.setText(String.join("\n", recipients));
+
+            recipientsArea.setText(String.join(", ", recipients));
 
             // Save on each edit
             recipientsArea.textProperty().addListener(new ChangeListener<String>() {
