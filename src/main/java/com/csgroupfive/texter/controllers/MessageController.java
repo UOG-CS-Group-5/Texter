@@ -209,11 +209,27 @@ public class MessageController {
         String[] recipientsArr = raw.split("\n|,");
         List<String> recipientsList = new ArrayList<>(Arrays.asList(recipientsArr));
 
-        // Normalize: keep digits only, require 10 digits
+        // Normalize: keep digits (require 10 digits) and email address-like things
         recipientsList = recipientsList.stream()
-                .map(s -> s == null ? "" : s.replaceAll("\\D", ""))
-                .filter(s -> s.length() == 10)
-                .collect(Collectors.toList());
+                                       .map(s -> {
+                                            if (s.indexOf('@') == -1) {
+                                                // remove non-numeric
+                                                return s.replaceAll("\\D", "");
+                                            } else {
+                                                // if it's an email address, just strip whitespaces
+                                                return s.strip();
+                                            }
+                                       })
+                                       .filter(s -> {
+                                            if (s.indexOf('@') == -1) {
+                                                // filter out non-10 digit numbers
+                                                return s != null && s.length() == 10;
+                                            } else {
+                                                // filter out things that don't look like an email. rudimentary check
+                                                return s.indexOf('.') > s.indexOf('@') && s.length() >= 6;
+                                            }
+                                       })
+                                       .collect(Collectors.toList());
 
         StoreSingleton.getInstance().setRecipients(recipientsList);
     }
