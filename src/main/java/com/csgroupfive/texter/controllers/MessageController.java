@@ -102,7 +102,7 @@ public class MessageController {
                         Platform.runLater(() -> suppressTextListener = false);
                     }
                 } else {
-                    String combined = combineSubjectBody(subj, body);
+                    List<String> combined = combineSubjectBody(subj, body);
                     StoreSingleton.getInstance().updateSavedMessage(selectedIndex, combined);
                 }
             }
@@ -174,6 +174,8 @@ public class MessageController {
             } else {
                 // grab message and list of recipients
                 String message = messageArea.getText().strip();
+                String subj = subjectArea.getText().strip();
+                String subjMsg = String.join("\n\n", new String[] {subj, message}).strip();
                 List<String> recipients = StoreSingleton.getInstance().getRecipients();
                 // for each recipient
                 for (String r : recipients) {
@@ -186,12 +188,17 @@ public class MessageController {
                         // differentiating types here so we can later add a subject field if wanted
                         if (isEmail) {
                             if (senderType == SenderType.EMAIL) {
-                                // TODO: add subject and/or from field once @Frances adds subject box
-                                status = ((Emailer) m).send_email(message, r);
+                                if (message.isEmpty()) {
+                                    status = ((Emailer) m).send_email(subj, r);
+                                } else if (subj.isEmpty()) {
+                                    status = ((Emailer) m).send_email(message, r);
+                                } else {
+                                    status = ((Emailer) m).send_email(subj, message, r);
+                                }
                             }
                         } else {
                             if (senderType == SenderType.SMS) {
-                                status = m.send_message(message, r);
+                                status = m.send_message(subjMsg, r);
                             }
                         }
                         // if successful, move on to the next recipient
@@ -244,13 +251,13 @@ public class MessageController {
         StoreSingleton.getInstance().setRecipients(recipientsList);
     }
 
-    private static String combineSubjectBody(String subject, String body) {
+    private static List<String> combineSubjectBody(String subject, String body) {
         subject = subject == null ? "" : subject.strip();
         body    = body    == null ? "" : body.strip();
 
-        if (subject.isEmpty()) return body;          // store body only
-        if (body.isEmpty())    return subject;       // store subject only
-        return subject + "\n" + body;                // store subject + body
+        // if (subject.isEmpty()) return Arrays.asList("", body);          // store body only
+        // if (body.isEmpty())    return Arrays.asList("", subject);       // store subject only
+        return Arrays.asList(subject, body);                // store subject + body
     }
 
     private void saveCurrentMessage() {
@@ -262,7 +269,7 @@ public class MessageController {
             return;
         }
 
-        String combined = combineSubjectBody(subj, body);
+        List<String> combined = combineSubjectBody(subj, body);
 
         if (selectedIndex >= 0) {
             StoreSingleton.getInstance().updateAndMoveSavedMessageToFront(selectedIndex, combined);
@@ -290,7 +297,7 @@ public class MessageController {
         if (vbox_msg == null) return;
         vbox_msg.getChildren().clear();
 
-        java.util.List<String> saved = StoreSingleton.getInstance().getSavedMessages();
+        List<List<String>> saved = StoreSingleton.getInstance().getSavedMessages();
         for (int i = 0; i < saved.size(); i++) {
             addBubbleToVBox(saved.get(i), i); // pass real index
         }
@@ -314,13 +321,13 @@ public class MessageController {
     }
 
     // create one bubble and add to the vbox
-    private void addBubbleToVBox(String text, int indexInStore) {
+    private void addBubbleToVBox(List<String> text, int indexInStore) {
         Node bubbleRow = createMessageBubble(text, indexInStore);
         vbox_msg.getChildren().add(bubbleRow);
     }
 
-    private Node createMessageBubble(String stored, int indexInStore) {
-        final String[] parsed = parseSubjectBody(stored);
+    private Node createMessageBubble(List<String> stored, int indexInStore) {
+        final String[] parsed = stored.toArray(new String[0]); // parseSubjectBody(stored);
         final String subjectText = parsed[0];
         final String bodyText    = parsed[1];
 

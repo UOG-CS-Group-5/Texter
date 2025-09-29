@@ -97,10 +97,14 @@ public class StoreSingleton {
         this.saveData();
     }
 
-    public List<String> getSavedMessages() {
+    public List<List<String>> getSavedMessages() {
         JSONArray arr = this.data.getJSONArray("savedMessages");
+
+        // map list of list of objects to list of string arrays
         return arr.toList().stream()
-                .map(Object::toString)
+                .map(o -> ((List<?>) o).stream()
+                        .map(Object::toString)
+                        .collect(Collectors.toList()))
                 .collect(Collectors.toList());
     }
 
@@ -112,10 +116,10 @@ public class StoreSingleton {
         this.saveData();
     }
 
-    public void updateSavedMessage(int index, String newText) {
+    public void updateSavedMessage(int index, List<String> newText) {
         if (newText == null) return;
-        String clean = newText.strip();
-        if (clean.isEmpty()) return;     // NEW: do not persist blanks
+        List<String> clean = List.of(newText.get(0).strip(), newText.get(1).strip());
+        if (String.join("", clean).isEmpty()) return;     // NEW: do not persist blanks
 
         JSONArray arr = this.data.getJSONArray("savedMessages");
         if (index >= 0 && index < arr.length()) {
@@ -124,15 +128,15 @@ public class StoreSingleton {
         }
     }
 
-    public void updateAndMoveSavedMessageToFront(int index, String newText) {
+    public void updateAndMoveSavedMessageToFront(int index, List<String> newText) {
         if (newText == null) return;
-        String clean = newText.strip();
-        if (clean.isEmpty()) return;
+        List<String> clean = List.of(newText.get(0).strip(), newText.get(1).strip());
+        if (String.join("", clean).isEmpty()) return;
 
-        org.json.JSONArray old = this.data.getJSONArray("savedMessages");
+        JSONArray old = this.data.getJSONArray("savedMessages");
         if (index < 0 || index >= old.length()) return;
 
-        org.json.JSONArray fresh = new org.json.JSONArray();
+        JSONArray fresh = new JSONArray();
         fresh.put(clean); // put edited at front
         for (int i = 0; i < old.length(); i++) {
             if (i == index) continue;
@@ -142,13 +146,13 @@ public class StoreSingleton {
         this.saveData();
     }
 
-    public void prependSavedMessage(String msg) {
+    public void prependSavedMessage(List<String> msg) {
         if (msg == null) return;
-        String clean = msg.strip();
-        if (clean.isEmpty()) return;
+        List<String> clean = List.of(msg.get(0).strip(), msg.get(1).strip());
+        if (String.join("", clean).isEmpty()) return;
 
-        org.json.JSONArray old = this.data.getJSONArray("savedMessages");
-        org.json.JSONArray fresh = new org.json.JSONArray();
+        JSONArray old = this.data.getJSONArray("savedMessages");
+        JSONArray fresh = new JSONArray();
         fresh.put(clean); // new at front
         for (int i = 0; i < old.length(); i++) {
             fresh.put(old.get(i));
