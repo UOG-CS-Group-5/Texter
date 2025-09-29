@@ -125,6 +125,15 @@ public class MessageController {
                     saveRecipients();  // call the method below
                 }
             });
+
+            // @Frances, I'll let you decide how you want this to show/say
+            Tooltip tip = new Tooltip("comma-separated 10-digit numbers and/or emails");
+            Tooltip.install(recipientsArea, tip);
+
+            tip.setShowDelay(Duration.seconds(0.1));
+            tip.setHideDelay(Duration.seconds(0.1));
+            tip.setShowDuration(Duration.seconds(5));
+
         }
 
         //Save
