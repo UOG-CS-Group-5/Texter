@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e61879ec-0050-49d0-813a-af14e3daa928" name="Changes" comment="" />
+    <list default="true" id="e61879ec-0050-49d0-813a-af14e3daa928" name="Changes" comment="testing ui stuff">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/csgroupfive/texter/StoreSingleton.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/csgroupfive/texter/StoreSingleton.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/csgroupfive/texter/controllers/MessageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/csgroupfive/texter/controllers/MessageController.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -63,6 +67,7 @@
   &quot;keyToString&quot;: {
     &quot;Application.App.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;
   }
 }</component>
