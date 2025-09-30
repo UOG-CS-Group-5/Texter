@@ -54,6 +54,9 @@ public class StoreSingleton {
         if (!json.has("message")) {
             json.put("message", "");
         }
+        if (!json.has("savedMessages")) {
+            json.put("savedMessages", new JSONArray());
+        }
         this.data = json;
     }
 
@@ -91,6 +94,49 @@ public class StoreSingleton {
 
     public void setMessage(String message) {
         this.data.put("message", message);
+        this.saveData();
+    }
+
+
+    public List<String> getSavedMessages() {
+        JSONArray arr = this.data.getJSONArray("savedMessages");
+        List<Object> raw = arr.toList();
+        return raw.stream().map(Object::toString).collect(Collectors.toList());
+    }
+
+    public void prependSavedMessage(String text) {
+        String safe = text == null ? "" : text;
+        List<String> list = new java.util.ArrayList<>(getSavedMessages());
+        list.removeIf(s -> s.equals(safe));   // optional de-dup
+        list.add(0, safe);
+        this.data.put("savedMessages", new JSONArray(list));
+        this.saveData();
+    }
+
+    public void updateSavedMessage(int index, String text) {
+        List<String> list = new java.util.ArrayList<>(getSavedMessages());
+        if (index < 0 || index >= list.size()) return;
+        list.set(index, text == null ? "" : text);
+        this.data.put("savedMessages", new JSONArray(list));
+        this.saveData();
+    }
+
+    public void updateAndMoveSavedMessageToFront(int index, String text) {
+        List<String> list = new java.util.ArrayList<>(getSavedMessages());
+        if (index < 0 || index >= list.size()) return;
+        String safe = text == null ? "" : text;
+        list.remove(index);
+        list.removeIf(s -> s.equals(safe));   // optional de-dup
+        list.add(0, safe);
+        this.data.put("savedMessages", new JSONArray(list));
+        this.saveData();
+    }
+
+    public void removeSavedMessage(int index) {
+        List<String> list = new java.util.ArrayList<>(getSavedMessages());
+        if (index < 0 || index >= list.size()) return;
+        list.remove(index);
+        this.data.put("savedMessages", new JSONArray(list));
         this.saveData();
     }
 }
