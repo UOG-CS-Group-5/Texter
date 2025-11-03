@@ -21,11 +21,14 @@ import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
@@ -39,6 +42,7 @@ public class MessageController {
     @FXML ScrollPane sp_main;
     @FXML VBox vbox_msg;
     @FXML Button newMsgButton;
+    @FXML VBox logVBox;
 
     private GreenApi greenApi = new GreenApi();
     private EmailToSmsSender gtaEmailToSms = new EmailToSmsSender("", "sms.gta.net");
@@ -50,6 +54,8 @@ public class MessageController {
     private int selectedIndex = -1;
     @SuppressWarnings("unused")
     private Text selectedBubbleText;
+    private boolean sending = false;
+    private LogController logController = null;
 
     @FXML
     private void switchToRecipients() throws IOException {
@@ -192,54 +198,122 @@ public class MessageController {
 
         // when send button is pressed
         sendButton.setOnAction(e -> {
+            if (sending) {
+                showInfo("Already sending something. Please wait.");
+                return;
+            }
             // if text area is empty
             if (messageArea.getText().strip().length() == 0) {
                 // show some user feedback telling user to fill text area
                 showInfo("Nothing to send");
+            } else if (recipientsArea.getText().strip().length() == 0) {
+                showInfo("Sending to nobody");
             } else {
-                // grab message and list of recipients
-                String message = messageArea.getText().strip();
-                String subj = subjectArea.getText().strip();
-                String subjMsg = String.join("\n\n", new String[] {subj, message}).strip();
-                List<String> recipients = StoreSingleton.getInstance().getRecipients();
-                // for each recipient
-                for (String r : recipients) {
-                    ApiResponseStatus status = null;
-                    // for each messageable endpoint
-                    for (Messagable m : messagables) {
+                // needs to be in its own thread because the GUI can't be updated while 
+                // running long-running tasks
+                Task<Void> task = new Task<>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        log("Sending message to " + recipientsArea.getText());
+                        // grab message and list of recipients
+                        String message = messageArea.getText().strip();
+                        String subj = subjectArea.getText().strip();
+                        String subjMsg = String.join("\n\n", new String[] {subj, message}).strip();
+                        List<String> recipients = StoreSingleton.getInstance().getRecipients();
+                        // for each recipient
+                        for (String r : recipients) {
+                            log("<=== Sending to " + r + " ===>");
+                            ApiResponseStatus status = null;
+                            // for each messageable endpoint
+                            for (Messagable m : messagables) {
 
-                        boolean isEmail = r.indexOf('@') != -1;
-                        SenderType senderType = ((Sender) m).getType();
-                        // differentiating types here so we can later add a subject field if wanted
-                        if (isEmail) {
-                            if (senderType == SenderType.EMAIL) {
-                                if (message.isEmpty()) {
-                                    status = ((Emailer) m).send_email(subj, r);
-                                } else if (subj.isEmpty()) {
-                                    status = ((Emailer) m).send_email(message, r);
+                                boolean doLog = false;
+                                boolean isEmail = r.indexOf('@') != -1;
+                                SenderType senderType = ((Sender) m).getType();
+                                // differentiating types here so we can later add a subject field if wanted
+                                if (isEmail) {
+                                    if (senderType == SenderType.EMAIL) {
+                                        doLog = true;
+                                        if (message.isEmpty()) {
+                                            status = ((Emailer) m).send_email(subj, r);
+                                        } else if (subj.isEmpty()) {
+                                            status = ((Emailer) m).send_email(message, r);
+                                        } else {
+                                            status = ((Emailer) m).send_email(subj, message, r);
+                                        }
+                                    }
                                 } else {
-                                    status = ((Emailer) m).send_email(subj, message, r);
+                                    if (senderType == SenderType.SMS) {
+                                        doLog = true;
+                                        status = m.send_message(subjMsg, r);
+                                    }
+                                }
+                                // if successful, move on to the next recipient
+                                if (status == ApiResponseStatus.SUCCESS) {
+                                    System.err.println(((Sender) m).getName() + " " + status);
+                                    log(((Sender) m).getName() + " status: " + status);
+                                    break;
+                                }
+                                if (doLog) {
+                                    System.err.println(((Sender) m).getName() + " " + status);
+                                    log(((Sender) m).getName() + " status: " + status);
                                 }
                             }
-                        } else {
-                            if (senderType == SenderType.SMS) {
-                                status = m.send_message(subjMsg, r);
-                            }
+                            System.err.println(status);
+                            log("Overall status: " + status);
+                            
                         }
-                        // if successful, move on to the next recipient
-                        if (status == ApiResponseStatus.SUCCESS) {
-                            break;
-                        }
-                        // TODO: possibly display unknowns and failures to user
-                        // @Francis, I'll let you decide
-                        System.err.println(((Sender) m).getName() + " " + status);
+                        log("Done sending...");
+                        sending = false;
+                        return null;
                     }
-                    // TODO: display error to user. 
-                    // @Francis, here's a UI task :)
-                    System.err.println(status);
-                }
+                };
+                task.setOnFailed(exp -> {
+                    Throwable ex = task.getException();
+                    System.out.println("Task failed: " + ex.getMessage());
+                    log("Failed to send");
+                    sending = false;
+                });
+                sending = true;
+                new Thread(task).start();
             }
         });
+    }
+
+    private boolean logIsClosed() {
+        return logController == null || logController.closed;
+    }
+
+    private void openLog() throws IOException {
+        FXMLLoader loader = new FXMLLoader(App.class.getResource("log.fxml"));
+        StackPane logPane = loader.load();
+
+        this.logVBox.getChildren().add(logPane);
+        
+        this.logController = loader.getController();
+        this.logController.setParent(this);
+        this.logVBox.setPrefHeight(160);
+        this.messageArea.setPrefHeight(300);
+    }
+
+    private void log(String message) {
+        // run later so this can be used in a thread
+        Platform.runLater(() -> {
+            // create a new log if it's closed
+            if (logIsClosed()) {
+                try {
+                    this.openLog();
+                } catch (IOException e) {
+                    System.err.println("ERROR: error loading log");
+                }
+            }
+            this.logController.log(message);
+        });
+    }
+
+    public void adjustAfterLogClose() {
+        logVBox.setPrefHeight(0);
+        messageArea.setPrefHeight(400);
     }
 
     private void saveRecipients() {

@@ -23,6 +23,10 @@
                    </font>
                </TextArea>
                <TextArea fx:id="messageArea" prefHeight="400.0" prefWidth="500.0" wrapText="true" />
+               <VBox fx:id="logVBox" prefHeight="0" prefWidth="500.0">
+                    <children>
+                    </children>
+               </VBox>
                <HBox fx:id="btn_box" alignment="CENTER" prefHeight="163.0" prefWidth="500.0" style="-fx-background-color: white;">
                    <children>
 

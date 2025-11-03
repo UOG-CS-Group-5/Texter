@@ -66,6 +66,17 @@
     -fx-background-insets: 0;
 }
 
+#logText {
+    -fx-text-fill: white;
+}
+#logText .content {
+    -fx-background-color: darkgrey;
+}
+#closeLogButton {
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+}
+
 .button {
     -fx-border-color: #506a55;
     -fx-border-width: 1;
