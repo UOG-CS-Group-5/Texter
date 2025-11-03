@@ -47,6 +47,18 @@
     -fx-background-color: #364d3a;  /* darker on hover */
 }
 
+#logText .scroll-pane,
+#logText .scroll-pane:focused,
+#logText .scroll-pane > .viewport,
+#logText .scroll-pane .corner,
+#logText .scroll-bar:vertical,
+#logText .scroll-bar:vertical .track,
+#logText .scroll-bar:vertical .track-background,
+#logText .scroll-bar:vertical .thumb {
+    -fx-background-color: darkgrey;
+}
+
+
 /* === Hide horizontal bar completely === */
 .scroll-bar:horizontal {
     -fx-pref-height: 0;
