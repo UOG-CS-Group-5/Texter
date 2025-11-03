@@ -32,7 +32,6 @@ public class LogController {
     }
 
     private void handleClose(ActionEvent event) {
-        System.err.println("closing");
         // Get the button that triggered the event
         Node source = (Node) event.getSource();
 
@@ -46,6 +45,5 @@ public class LogController {
         }
         this.parentController.adjustAfterLogClose();
         this.closed = true;
-        System.err.println("closed");
     }
 }
